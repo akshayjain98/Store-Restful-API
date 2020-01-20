@@ -1,3 +1,4 @@
+import os
 from flask import Flask
 from Resource.UserRoute import UserRoute
 from Resource.ItemRoute import ItemRoute, ItemRouteById
@@ -11,7 +12,7 @@ app = Flask(__name__)
 
 app.secret_key = "AKSHAYJAIN"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///store.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///store.db")
 # JWT token generation
 jwt = JWT(app, authentication, identity)
 
