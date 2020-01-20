@@ -18,10 +18,6 @@ jwt = JWT(app, authentication, identity)
 
 # creating database with its table using SQLAlchemy
 
-@app.before_first_request
-def create_tables():
-    db.create_all()
-
 
 api = Api(app)
 
