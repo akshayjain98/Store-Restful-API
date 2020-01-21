@@ -22,6 +22,10 @@ jwt = JWT(app, authentication, identity)
 
 api = Api(app)
 
+@app.before_first_request
+def create_tables():
+    db.create_all()
+
 # Calling User Route
 api.add_resource(UserRoute, "/user")
 

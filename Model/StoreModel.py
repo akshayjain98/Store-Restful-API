@@ -17,9 +17,6 @@ class StoreModel(db.Model):
 
     def save_store(self):
         try:
-            result_store_detail = StoreModel.get_by_name(name=self.name)
-            if result_store_detail:
-                return {"message": "Store detail already exists!", "status": False}
             db.session.add(self)
             db.session.commit()
             return {"message": "Store detail saved successfully!", "status": True}
@@ -29,14 +26,20 @@ class StoreModel(db.Model):
     @classmethod
     def get_by_name(cls, name):
         try:
-            return cls.query.filter_by(name=name).first()
+            store_data = cls.query.filter_by(name=name).first()
+            if store_data:
+                return store_data
+            return None
         except:
             return {"message": "An error has been occure!", "status": False}
 
     def get_all(self):
         try:
             stores = self.query.all()
-            return [store.json() for store in stores]
+            if len(stores):
+                return [store.json() for store in stores]
+            else:
+                return None
         except:
             return {"message": "An error has been occure!", "status": False}
 

@@ -21,9 +21,6 @@ class ItemModel(db.Model):
 
     def save_item(self):
         try:
-            result_item_detail = self.get_item_by_name(self.name)
-            if result_item_detail:
-                return {"message": "Item already exists", "status": False}, 200
             db.session.add(self)
             db.session.commit()
             return {"message": "Success", "status": True}, 200
@@ -52,9 +49,10 @@ class ItemModel(db.Model):
         except:
             return {"error": "An error has been occur, Please restart it again!", "status": False}
 
-    def get_item_by_name(self, name):
+    @classmethod
+    def get_item_by_name(cls, name):
         try:
-            return self.query.filter_by(name=name).first()
+            return cls.query.filter_by(name=name).first()
         except:
             return {"error": "An error has been occur, Please restart it again!", "status": False}, 500
 

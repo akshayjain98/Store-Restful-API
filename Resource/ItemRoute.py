@@ -16,7 +16,11 @@ class ItemRoute(Resource):
 
     @jwt_required()
     def post(self):
-        item_detail = ItemModel(**validate_item_data())
+        item_data = validate_item_data()
+        item_detail = ItemModel.get_item_by_name(item_data["name"])
+        if item_detail:
+            return {"message": "Item already exists"}
+        item_detail = ItemModel(**item_data)
         return item_detail.save_item()
 
     @jwt_required()
@@ -26,11 +30,6 @@ class ItemRoute(Resource):
         if items:
             return items
         return {"message": "No Record Found"}
-
-    @jwt_required()
-    def put(self):
-        item_detail = ItemModel(**validate_item_data())
-        return item_detail.save_item()
 
 
 class ItemRouteById(Resource):
@@ -51,3 +50,14 @@ class ItemRouteById(Resource):
         else:
             return {"message": "No Record Found"}
 
+    @jwt_required()
+    def put(self, item_id):
+        item_model = ItemModel.get_item_by_id(item_id)
+        if item_model:
+            data = validate_item_data()
+            item_model.name = data["name"]
+            item_model.price = data["price"]
+            item_model.store_id = data["store_id"]
+            return item_model.save_item()
+        else:
+            return {"message": "No Record Found"}
