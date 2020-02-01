@@ -1,6 +1,6 @@
 from Model.StoreModel import StoreModel
 from flask_restful import reqparse, Resource
-from flask_jwt import jwt_required
+from flask_jwt_extended import jwt_required
 
 
 def validate_store_detail():
@@ -10,15 +10,14 @@ def validate_store_detail():
 
 
 class StoreRoute(Resource):
-    @jwt_required()
+    @jwt_required
     def get(self):
         store_model = StoreModel()
         result_store_detail = store_model.get_all()
         return {"store": result_store_detail, "status": True} if result_store_detail else {"message": "No Record Found",
                                                                                            "status": False}
 
-
-    @jwt_required()
+    @jwt_required
     def post(self):
         store_data = validate_store_detail()
         result_store_detail = StoreModel.get_by_name(store_data["name"])
@@ -29,19 +28,19 @@ class StoreRoute(Resource):
 
 
 class StoreByNameRoute(Resource):
-    @jwt_required()
+    @jwt_required
     def get(self, name):
         result_store_detail = StoreModel.get_by_name(name)
         return {"store": result_store_detail, "status": True} if result_store_detail else {"message": "No Record Found",
                                                                                            "status": False}
 
-    @jwt_required()
+    @jwt_required
     def delete(self, name):
         result_store_detail = StoreModel.get_by_name(name)
         return result_store_detail.delete_store() if result_store_detail else {"message": "No Record Found",
                                                                                "status": False}
 
-    @jwt_required()
+    @jwt_required
     def put(self, name):
         store_model = StoreModel.get_by_name(name)
         if store_model:

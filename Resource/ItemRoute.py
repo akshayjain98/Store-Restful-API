@@ -1,7 +1,7 @@
 from Model.ItemModel import ItemModel
 from flask_restful import Resource
 from flask_restful import reqparse
-from flask_jwt import jwt_required
+from flask_jwt_extended import *
 
 
 def validate_item_data():
@@ -14,7 +14,7 @@ def validate_item_data():
 
 class ItemRoute(Resource):
 
-    @jwt_required()
+    @fresh_jwt_required    # when we need Fresh token and want avoid this end point when their is refresh token
     def post(self):
         item_data = validate_item_data()
         item_detail = ItemModel.get_item_by_name(item_data["name"])
@@ -23,18 +23,32 @@ class ItemRoute(Resource):
         item_detail = ItemModel(**item_data)
         return item_detail.save_item()
 
-    @jwt_required()
+    # @jwt_required
+    # def get(self):
+    #     item_model = ItemModel()
+    #     items = item_model.get_items()
+    #     if items:
+    #         return items
+    #     return {"message": "No Record Found"}
+
+    @jwt_optional
     def get(self):
-        item_model = ItemModel()
-        items = item_model.get_items()
+        items = ItemModel.get_all()
         if items:
-            return items
-        return {"message": "No Record Found"}
+            user_id = get_jwt_identity()
+            if user_id:
+                # user_id = user_id["id"]
+                items = [item.json() for item in items]
+                return {"message": items}
+            items = [item.json()["item_name"] for item in items]
+            return {"items": items, "message": "Please login to view full product details"}
+        else:
+            return {"message": "No Items Found"}
 
 
 class ItemRouteById(Resource):
 
-    @jwt_required()
+    @jwt_required
     def get(self, item_id):
         item_model = ItemModel()
         items = item_model.get_item(item_id)
@@ -42,7 +56,7 @@ class ItemRouteById(Resource):
             return items.json(), 200
         return {"message": "No Record Found"}, 204
 
-    @jwt_required()
+    @jwt_required
     def delete(self, item_id):
         item_model = ItemModel.get_item_by_id(item_id)
         if item_model:
@@ -50,7 +64,7 @@ class ItemRouteById(Resource):
         else:
             return {"message": "No Record Found"}
 
-    @jwt_required()
+    @jwt_required
     def put(self, item_id):
         item_model = ItemModel.get_item_by_id(item_id)
         if item_model:

@@ -50,6 +50,12 @@ class ItemModel(db.Model):
             return {"error": "An error has been occur, Please restart it again!", "status": False}
 
     @classmethod
+    def get_all(self):
+        try:
+            return self.query.all()
+        except:
+            return {"error": "An error has been occur, Please restart it again!", "status": False}
+    @classmethod
     def get_item_by_name(cls, name):
         try:
             return cls.query.filter_by(name=name).first()
